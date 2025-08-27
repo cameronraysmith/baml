@@ -516,6 +516,7 @@ impl<'g> HirCompiler<'g> {
 
                         self.compile_expression(base);
                         self.compile_expression(index);
+                        self.compile_expression(value);
 
                         self.emit(match base.meta().1.as_ref().expect("must have a resolved type") {
                             TypeIR::List(_, _) => Instruction::StoreArrayElement,
