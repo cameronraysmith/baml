@@ -512,7 +512,7 @@ impl<'g> HirCompiler<'g> {
                         self.compile_expression(value);
                         self.emit(Instruction::StoreField(field_index));
                     }
-                    thir::Expr::ArrayAccess {base, index, meta} => {
+                    thir::Expr::ArrayAccess {base, index, meta: _} => {
 
                         self.compile_expression(base);
                         self.compile_expression(index);
@@ -584,7 +584,7 @@ impl<'g> HirCompiler<'g> {
                         self.emit(binop);
                         self.emit(Instruction::StoreField(field_index));
                     }
-                    thir::Expr::ArrayAccess { base, index, meta } => {
+                    thir::Expr::ArrayAccess { base, index, meta: _ } => {
                         // Compound Assignment for array[index] or map[key]
                         //
                         // For array[index] += value (or other compound ops):
@@ -940,7 +940,7 @@ impl<'g> HirCompiler<'g> {
                 self.compile_block(block);
             }
 
-            thir::Expr::ArrayAccess { base, index, meta } => {
+            thir::Expr::ArrayAccess { base, index, meta: _ } => {
                 // ArrayAccess compilation for loading elements
                 //
                 // Steps to compile array[index] or map[key]:
@@ -1333,9 +1333,9 @@ impl<'g> HirCompiler<'g> {
         }
     }
 
-    fn emit_string_literal(&mut self, v: &String) {
+    fn emit_string_literal(&mut self, v: &str) {
         // Allocate the string in the objects pool
-        let object_index = self.objects.insert(Object::String(v.clone()));
+        let object_index = self.objects.insert(Object::String(v.to_owned()));
         // Add a constant that points to the string object
         let const_index = self.add_constant(Value::Object(object_index));
         self.emit(Instruction::LoadConst(const_index));

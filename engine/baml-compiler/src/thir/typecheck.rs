@@ -978,7 +978,7 @@ fn typecheck_assignment(
     context: &mut TypeContext<'_>,
     diagnostics: &mut Diagnostics,
 ) {
-    if !is_assignable(lhs, rhs, diagnostics, context) {
+    if !is_assignable(lhs,  diagnostics, context) {
         diagnostics.push_error(DatamodelError::new_validation_error(
             // perf: `new_validation_error` could accept Cow / into cow directly and
             // avoid copy here.
@@ -1056,7 +1056,6 @@ fn assign_error(lhs: &thir::Expr<IRMeta>) -> Cow<'static, str> {
 /// Ensures that the location pointed to by `lhs` is assignable.
 fn is_assignable(
     lhs: &thir::Expr<IRMeta>,
-    rhs: &thir::Expr<IRMeta>,
     diagnostics: &mut Diagnostics,
     ctx: &TypeContext,
 ) -> bool {
@@ -1065,7 +1064,7 @@ fn is_assignable(
         // Since variable has been checked, info must exist.
         thir::Expr::Var(name, _meta) => ctx.vars[name].mut_var_info.is_some(),
         thir::Expr::ArrayAccess { base, .. } | thir::Expr::FieldAccess { base, .. } => {
-            is_assignable(base, rhs, diagnostics, ctx)
+            is_assignable(base, diagnostics, ctx)
         }
         _ => {
             diagnostics.push_error(DatamodelError::new_validation_error(
