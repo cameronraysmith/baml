@@ -327,8 +327,6 @@ fn parse_map(token: Pair<'_>, diagnostics: &mut Diagnostics) -> Expression {
     let entries = if let Some(first) = inner.next() {
         let first_rule = first.as_rule();
 
-        let mut entries = Vec::new();
-
         let first_entry = parse_map_entry(first, diagnostics).into_iter();
 
         let rest_of_entries = inner.filter_map(|pair| {
