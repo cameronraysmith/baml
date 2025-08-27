@@ -517,7 +517,7 @@ impl<'g> HirCompiler<'g> {
                         self.compile_expression(base);
                         self.compile_expression(index);
 
-                        self.emit(match meta.1.as_ref().expect("must have a resolved type") {
+                        self.emit(match base.meta().1.as_ref().expect("must have a resolved type") {
                             TypeIR::List(_, _) => Instruction::StoreArrayElement,
                             TypeIR::Map(_, _, _) => Instruction::StoreMapElement,
                             _ => panic!("array access should be either map or array.")
@@ -602,7 +602,7 @@ impl<'g> HirCompiler<'g> {
                         // The same pattern applies for maps with StoreMapElement
                         
                         // Determine if it's a list or map
-                        let (load_instr, store_instr) = match meta.1.as_ref().expect("must have a resolved type") {
+                        let (load_instr, store_instr) = match base.meta().1.as_ref().expect("must have a resolved type") {
                             TypeIR::List(_, _) => (Instruction::LoadArrayElement, Instruction::StoreArrayElement),
                             TypeIR::Map(_, _, _) => (Instruction::LoadMapElement, Instruction::StoreMapElement),
                             _ => panic!("array access should be either map or array.")
@@ -959,7 +959,7 @@ impl<'g> HirCompiler<'g> {
                 self.compile_expression(index);
 
                 // Determine if it's an array or map and emit appropriate instruction
-                self.emit(match meta.1.as_ref().expect("must have a resolved type") {
+                self.emit(match base.meta().1.as_ref().expect("must have a resolved type") {
                     TypeIR::List(_, _) => Instruction::LoadArrayElement,
                     TypeIR::Map(_, _, _) => Instruction::LoadMapElement,
                     _ => panic!("array access should be either map or array.")
@@ -1070,6 +1070,8 @@ impl<'g> HirCompiler<'g> {
                     }) => format!("{class_name}.{method}"),
 
                     Some(TypeIR::List(_, _)) => format!("std.Array.{method}"),
+
+                    Some(TypeIR::Map(_, _, _)) => format!("std.Map.{method}"),
 
                     other => panic!("method calls must be on classes, got: {other:#?}"),
                 };
