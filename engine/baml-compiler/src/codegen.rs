@@ -1016,13 +1016,14 @@ impl<'g> HirCompiler<'g> {
             thir::Expr::Map(pairs, _) => {
                 // Maps are not yet implemented in bytecode
                 // have N keys, N values.
-
-                for (key, _) in pairs {
-                    self.emit_string_literal(key);
-                }
+                // keys are popped first, so we first compute the values.
 
                 for (_, value) in pairs {
                     self.compile_expression(value);
+                }
+
+                for (key, _) in pairs {
+                    self.emit_string_literal(key);
                 }
 
                 self.emit(Instruction::AllocMap(pairs.len()));
